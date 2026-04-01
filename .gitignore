@@ -54,4 +54,3 @@ coverage.xml
 # Environment variables (Sensitive Info)
 # .env
 .Rproj.user/
-.Rproj*
