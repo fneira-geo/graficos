@@ -12,8 +12,17 @@ sapply(librerias, require, character.only = TRUE, quietly = TRUE)
 
 
 ## FUNCIONES ------------------------------------------------------------------
+lee_xls_data <- function(path, sheet){
+  readxl::read_excel(
+    data = path,
+    sheet = sheet
+  )
+}
+
 
 # metadata
+
+
 metadata <- readxl::read_excel(
   file.path(DATA_ENT, "BBDD_2026_LOS_RIOS.xlsx"),
   sheet = "metadata"
@@ -27,7 +36,13 @@ data_tn <- readxl::read_excel(
 data_tx <- readxl::read_excel(
   file.path(DATA_ENT, "BBDD_2026_LOS_RIOS.xlsx"),
   sheet = "tx"
-)
+) %>%
+  pivot_longer(
+    cols = -c(fecha, año, mes, dia), # Mantenemos el tiempo fijo
+    names_to = "estacion_id",        # Los nombres de columnas pasan a esta variable
+    values_to = "valor",             # Los datos numéricos pasan a esta
+    values_drop_na = TRUE            # Opcional: elimina las filas con NA para ahorrar memoria
+  )
 
 data_pp <- readxl::read_excel(
   file.path(DATA_ENT, "BBDD_2026_LOS_RIOS.xlsx"),
@@ -37,21 +52,10 @@ data_pp <- readxl::read_excel(
 plot(data_pp$`10360002-2`)
 
 
-library(performance)
-library(see)
-library(ggplot2)
-
-# Simulación de serie temporal con un outlier
-set.seed(123)
-df <- data.frame(
-  fecha = seq(as.Date("2023-01-01"), by = "day", length.out = 100),
-  valor = rnorm(100)
+tidyr::pivot_longer(
+  data = data_tn,
+  names_to =  c("fecha", "año", "mes", "dia"),
+  valuest_to = "value"
 )
-df$valor[50] <- 10 # Outlier artificial
 
-# Detección robusta (MAD-based)
-outliers_mad <- check_outliers(df$valor, method = "zscore_robust")
-
-# Visualización rápida con 'see' (extensión de ggplot2)
-plot(outliers_mad)
 
