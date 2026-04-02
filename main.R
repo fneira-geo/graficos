@@ -257,3 +257,6 @@ writexl::write_xlsx(
 #     .groups = "drop"
 #   )
 
+ggplot(data = pp_mensual, aes(x = paste0(año, "-", mes), y=estacion_id, fill=n_datos)) +
+  geom_tile()
+
