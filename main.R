@@ -32,49 +32,54 @@ sapply(librerias, require, character.only = TRUE, quietly = TRUE)
 
 
 ## FUNCIONES ------------------------------------------------------------------
-lee_xls_data <- function(ruta){
+# lee_xls_data <- function(ruta){
   
-  lee_xls <- function(ruta, hoja) {
-    readxl::read_excel(path = ruta,
-                       sheet = hoja,
-                       col_types = "text") %>%
-      tidyr::pivot_longer(
-        cols = -c(fecha, año, mes, dia),
-        names_to = "estacion_id",
-        values_to = "valor",
-        values_drop_na = TRUE
-      ) %>%
-      dplyr::mutate(
-        fecha = lubridate::as_date(sprintf('%s-%s-%s', año, mes, dia)),
-        valor = as.numeric(valor),
-        variable = hoja
-      ) %>%
-      dplyr::select(dplyr::all_of(
-        c(
-          "fecha",
-          "año",
-          "mes",
-          "dia",
-          "variable",
-          "estacion_id",
-          "valor"
-        )
-      ))
-  }
-  
-  
-  hojas_interes <- c("tn", "tx", "pp", "rd", "hr", "vv", "ps")
-  
-  hojas <- readxl::excel_sheets(ruta)
-  
-  
-  lista_df <- sapply(
-    hojas[hojas %in% hojas_interes], 
-    lee_xls, 
-    ruta = ruta,
-    simplify = FALSE
-  )
-}
+#   lee_xls <- function(ruta, hoja) {
+#     readxl::read_excel(path = ruta,
+#                        sheet = hoja,
+#                        col_types = "text") %>%
+#       tidyr::pivot_longer(
+#         cols = -c(fecha, año, mes, dia),
+#         names_to = "estacion_id",
+#         values_to = "valor",
+#         values_drop_na = FALSE
+#       ) %>%
+#       dplyr::mutate(
+#         fecha = lubridate::as_date(sprintf('%s-%s-%s', año, mes, dia)),
+#         valor = as.numeric(valor),
+#         variable = hoja
+#       ) %>%
+#       dplyr::select(dplyr::all_of(
+#         c(
+#           "fecha",
+#           "año",
+#           "mes",
+#           "dia",
+#           "variable",
+#           "estacion_id",
+#           "valor"
+#         )
+#       ))
+#   }
+#   hojas_interes <- c("tn", "tx", "pp", "rd", "hr", "vv", "ps")
+#   hojas <- readxl::excel_sheets(ruta)
+#   lista_df <- sapply(
+#     hojas[hojas %in% hojas_interes], 
+#     lee_xls, 
+#     ruta = ruta,
+#     simplify = FALSE
+#   )
+# }
+
+
+source('src/utils_escribe_climatol.R')
+
+# CODIGO ----------------------------------------------------------------------
+
+
+
+# OUTPUT ----------------------------------------------------------------------
+
 
 
 lee_xls_data <- function(ruta) {
@@ -223,7 +228,13 @@ calcular_mensuales_tn <- function(lista_datos) {
 metadata <- readxl::read_excel(
   path=file.path(DATA_ENT, "BBDD_2026_LOS_RIOS.xlsx"),
   sheet = "metadata"
-)
+) %>%
+  dplyr::rename(
+    codigo = bna,
+    latitud = lat,
+    longitud = lon,
+    altura = alt
+  )
 
 data <- lee_xls_data(
   ruta = file.path(DATA_ENT, "BBDD_2026_LOS_RIOS.xlsx")
@@ -234,8 +245,22 @@ pp_mensual <- calcular_mensuales_pp(data)
 tn_mensual <- calcular_mensuales_tn(data)
 tx_mensual <- calcular_mensuales_tx(data)
 
+
+pp_wide <- tidyr::pivot_wider(
+  data = pp_mensual,
+  id_cols = c("año", "mes"),
+  names_from = "estacion_id",
+  values_from = "valor_mensual"
+)
+
+
+
 pp_anual_historica <- calcular_pp_anual_historica(pp_mensual)
 
+writeClimatolFiles(
+  meta = metadata,
+  data = pp_wide
+)
 
 writexl::write_xlsx(
   x = list(
@@ -249,14 +274,12 @@ writexl::write_xlsx(
 )
 
 
-# resumen_historico <- pp_mensual %>%
-#   group_by(estacion_id, mes) %>%
-#   summarise(
-#     media_historica = mean(valor_mensual, na.rm = TRUE),
-#     desviacion_std = sd(valor_mensual, na.rm = TRUE),
-#     .groups = "drop"
-#   )
+resumen_historico <- pp_mensual %>%
+  group_by(estacion_id, mes) %>%
+  summarise(
+    media_historica = mean(valor_mensual, na.rm = TRUE),
+    desviacion_std = sd(valor_mensual, na.rm = TRUE),
+    .groups = "drop"
+)
 
-ggplot(data = pp_mensual, aes(x = paste0(año, "-", mes), y=estacion_id, fill=n_datos)) +
-  geom_tile()
 
