@@ -32,11 +32,11 @@ años  <- factor(1900:2100, labels=1900:2100, levels = 1900:2100, order = TRUE)
 # PIPELINE --------------------------------------------------------------------
 
 # 1.1 Cargar metadatos estaciones
-metadata_estaciones <- read_excel(
+metadata_estaciones <- readxl::read_excel(
   path = file.path(DIR_ENT, "BBDD_RAW_2026_DGA-INIA_LOS_RIOS.xlsx"),
   sheet = "metadata"
 ) %>%
-  rename(
+  dplyr::rename(
     codigo   = bna,
     latitud  = lat,
     longitud = lon,
@@ -52,11 +52,11 @@ tn_mensual <- calcular_mensuales(data, "tn", "min")
 tx_mensual <- calcular_mensuales(data, "tx", "max")
 
 # 2.1. Cargar metadata de datos ERA5
-metadata_ERA5 <- read_excel(
+metadata_ERA5 <- readxl::read_excel(
   path = file.path(DIR_ENT, "BBDD_RAW_2026_ERA5_LOS_RIOS.xlsx"),
   sheet = "metadata"
 ) %>%
-  rename(
+  dplyr::rename(
     codigo   = bna,
     latitud  = lat,
     longitud = lon,
@@ -82,33 +82,64 @@ tx_era5 <- data_era5$tx %>% dplyr::mutate(valor = valor - 273.5, valor_mensual =
   dplyr::select(any_of(c("estacion_id", "año", "mes", "valor_mensual", "variable")))
 
 # 5. Transformar datos estaciones a formato wide para climatología
-pp_wide <- pivot_wider(
+pp_wide <- tidyr::pivot_wider(
   data = dplyr::rows_append(pp_mensual, pp_era5),
   id_cols = c("año", "mes"),
   names_from = "estacion_id",
   values_from = "valor_mensual"
 ) %>%
+    dplyr::mutate(año = as.character(año) 
+) %>%
+    dplyr::filter(año > 1989 & año < 2021
+) %>%
   dplyr::mutate(
     año = factor(año, levels = años),
-    mes = factor(mes, levels = meses)
+    mes = factor(mes, levels = meses),
+    date =paste(año, mes, sep="-"), .before = 1
 ) %>%
-  arrange(año, mes)
+  dplyr::arrange(año, mes
+) %>%
+  dplyr::select(-c("año", "mes"))
 
 
-tn_wide <- pivot_wider(
+tn_wide <- tidyr::pivot_wider(
   data = dplyr::rows_append(tn_mensual, tn_era5),
   id_cols = c("año", "mes"),
   names_from = "estacion_id",
   values_from = "valor_mensual"
-)
+) %>%
+    dplyr::mutate(año = as.character(año) 
+) %>%
+    dplyr::filter(año > 1989 & año < 2021
+) %>%
+  dplyr::mutate(
+    año = factor(año, levels = años),
+    mes = factor(mes, levels = meses),
+    date =paste(año, mes, sep="-"), .before = 1
+) %>%
+  dplyr::arrange(año, mes
+) %>%
+  dplyr::select(-c("año", "mes"))
 
-tx_wide <- pivot_wider(
+
+tx_wide <- tidyr::pivot_wider(
   data = dplyr::rows_append(tx_mensual, tx_era5),
   id_cols = c("año", "mes"),
   names_from = "estacion_id",
   values_from = "valor_mensual"
 ) %>%
-  arrange(año, mes)
+    dplyr::mutate(año = as.character(año) 
+) %>%
+    dplyr::filter(año > 1989 & año < 2021
+) %>%
+  dplyr::mutate(
+    año = factor(año, levels = años),
+    mes = factor(mes, levels = meses),
+    date =paste(año, mes, sep="-"), .before = 1
+) %>%
+  dplyr::arrange(año, mes
+) %>%
+  dplyr::select(-c("año", "mes"))
 
 
 metadata_wide <- dplyr::bind_rows(
@@ -144,9 +175,11 @@ escribe_climatol <- function(meta, data, ruta, nombre){
   
   meta <- na.omit(meta)
   
-  data <- data %>%
-    dplyr::mutate(año = as.character(año) ) %>%
-    dplyr::filter(año > 1989 & año < 2021)
+  data <- data %>% dplyr::select(-c("date"))
+  print(head(data))
+
+  print(str(meta))
+  print(str(data))
 
   #print(min(data[["año"]]))
   #print(max(data[["año"]]))
@@ -168,8 +201,10 @@ escribe_climatol <- function(meta, data, ruta, nombre){
   )
 }
 
+metadata_wide$codigo
+names(pp_wide)[!(names(pp_wide) %in% na.omit(metadata_wide)$codigo)]
 
-escribe_climatol(ruta = "output/", meta = metadata_wide, data = pp_wide, nombre = "PP_1990-2020")
+escribe_climatol(ruta = "output/", meta = metadata_wide, data = pp_wide, nombre = "PP-m_1990-2020")
 
 # file.exists(
 #   file.path(
@@ -184,13 +219,14 @@ escribe_climatol(ruta = "output/", meta = metadata_wide, data = pp_wide, nombre 
 list.files()
 
 climatol::homogen(
-  varcli = "PP",
-  anyi = "1990",
-  anyf = "2020"
+  varcli = "output/CLIMATOL/PP-m",
+  anyi = 1990,
+  anyf = 2020,
+  onlyQC = TRUE
 )
 
 climatol::homogen(
-    file.path("PP"),
+    file.path("output/CLIMATOL/PP"),
     1990,
     2020,
     onlyQC = T,
@@ -207,7 +243,7 @@ climatol::homogen(
 
 
 # 2. Exportar resultados a Excel
-write_xlsx(
+writexl::write_xlsx(
   x = list(
     metadata        = metadata_wide,
     pp_mensual      = pp_wide,

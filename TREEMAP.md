@@ -1,6 +1,6 @@
 # Proyecto: graficos
 
-_Generado: 2026-05-06 11:58_
+_Generado: 2026-05-08 09:22_
 
 ## Estructura
 
@@ -8,6 +8,7 @@ _Generado: 2026-05-06 11:58_
 graficos/
 ├── src
 │   ├── plt_heatmap.R  # NOT IMPLEMENTED. Crear y disponibilizar mapas de calor asociados a la cantidad de datos disponibles en la serie de datos
+│   ├── plt_mapa.R  # —
 │   ├── plt_ts_anomaly.R  # grafico de serie de tiempo y anamolias su enfoque es mostrar aquellos valores anomalos en la serie de tiempo
 │   ├── utils_calcular_climatologia_anual.R  # hace analisis de media mensual de los datos en formato estandar
 │   ├── utils_calcular_mensuales.R  # Calcula agregados mensuales para una variable meteorológica
@@ -24,6 +25,8 @@ graficos/
 ├── main.py  # —
 ├── main.R  # Pipeline ETL de análisis climático, procesamiento de datos
 ├── metadata.yaml
+├── PP_1990-2020.txt  # HOMOGEN() APPLICATION OUTPUT  (From R's contributed package 'climatol' 4.3-2a)
+├── PP_1990-2021.txt  # HOMOGEN() APPLICATION OUTPUT  (From R's contributed package 'climatol' 4.3-2a)
 ├── pyproject.toml
 ├── README.md  # 🌡️ graficos · 📋 Tabla de contenidos · 🔄 Flujo de datos
 └── TEMPLATE_R.md  # Plantilla de Scripts R — Proyecto GRAFICOS · Tipos de script y secciones obligatorias · Template: `main.R`
@@ -33,6 +36,9 @@ graficos/
 
 ### `plt_heatmap.R`
 NOT IMPLEMENTED. Crear y disponibilizar mapas de calor asociados a la cantidad de datos disponibles en la serie de datos
+
+### `plt_mapa.R`
+—
 
 ### `plt_ts_anomaly.R`
 grafico de serie de tiempo y anamolias su enfoque es mostrar aquellos valores anomalos en la serie de tiempo
@@ -121,6 +127,13 @@ Pipeline ETL de análisis climático, procesamiento de datos
 **PIPELINE**
 
 **SALIDA**
+· `escribe_climatol(meta, data, ruta, nombre)`  — 1. Exportar archivo Climatol
+
+### `PP_1990-2020.txt`
+HOMOGEN() APPLICATION OUTPUT  (From R's contributed package 'climatol' 4.3-2a)
+
+### `PP_1990-2021.txt`
+HOMOGEN() APPLICATION OUTPUT  (From R's contributed package 'climatol' 4.3-2a)
 
 ### `README.md`
 🌡️ graficos · 📋 Tabla de contenidos · 🔄 Flujo de datos

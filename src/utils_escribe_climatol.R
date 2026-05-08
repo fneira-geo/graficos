@@ -1,46 +1,48 @@
 #' @title:  utils_escribe_climatol.R  
-#' @description:  da formato de los datos en dataframe wide, entregar la estructura
-#' de datos necesarias para escribir datos para ser leidos por paquete CLIMATOL
-#' @section REORDENA:
-#' - toma el dataframe y reordena los datos para climatol.
+#' @description:  Formatea dataframe wide al formato de archivos .est y .dat
+#' requerido por el paquete CLIMATOL.
 #' @section ESCRIBE:
-#' - escribe los datos ordenados en la funcion anterior, para escribir los archivos.
+#' - Recibe metadata y data en formato wide (solo columnas numéricas de estaciones)
+#' - Devuelve lista con: meta (data.frame) y data (matrix numérica)
+#' @note: 'data' NO debe incluir columnas de fecha ni auxiliares (date, año, mes).
+#'         El filtro y selección de columnas se hace en escribe_climatol() en main.R.
 
 
-# REORDENA --------------------------------------------------------------------
 writeClimatolFiles <- function(meta, data) {
 
-    out.meta <- meta %>%
-        data.frame() %>%
-        dplyr::select(dplyr::all_of(c("longitud", "latitud", 'altura',"codigo", "nombre"))) %>%
-        `colnames<-`(c("X", "Y", "Z", "CODE", "NOMBRE")) %>%
-        # mutate(Z = 0, .before = 3) %>%
-        dplyr::mutate(NOMBRE = toupper(NOMBRE), CODE = stringr::str_replace_all(CODE, "-", "_"))
-
-    out.data <- data %>%
-        `names<-`(NULL) %>%
-        `row.names<-`(NULL) %>%
-        as.matrix()
-
-    return(list(meta = out.meta, data = out.data))
-}
-
-
-
-# ESCRIBE ---------------------------------------------------------------------
-writeClimatolFiles <- function(meta, data) {
-  
-  # Faster selection and renaming using basic indexing
+  # Metadatos en orden requerido por CLIMATOL: X(lon) Y(lat) Z(alt) CODE NAME
   out.meta <- data.frame(
-    X = meta$longitud,
-    Y = meta$latitud,
-    Z = meta$altura,
-    CODE = gsub("-", "_", meta$codigo),
+    X      = meta$longitud,
+    Y      = meta$latitud,
+    Z      = meta$altura,
+    CODE   = gsub("-", "_", meta$codigo),   # CLIMATOL no acepta guiones en códigos
     NOMBRE = toupper(meta$nombre),
     stringsAsFactors = FALSE
   )
 
-  # Converting to matrix and stripping names in one go
+  # FIX: eliminar cualquier columna no numérica residual (date, año, mes)
+  # antes de convertir a matriz para el .dat
+  cols_numericas <- vapply(data, is.numeric, logical(1))
+  if (any(!cols_numericas)) {
+    warning(
+      "writeClimatolFiles: eliminando columnas no numéricas del .dat: ",
+      paste(names(data)[!cols_numericas], collapse = ", ")
+    )
+    data <- data[, cols_numericas, drop = FALSE]
+  }
+
+  # Verificación: número de columnas debe coincidir con filas de meta
+  if (ncol(data) != nrow(out.meta)) {
+    stop(sprintf(
+      "Mismatch: data tiene %d columnas de estaciones, meta tiene %d filas. ",
+      ncol(data), nrow(out.meta),
+      "Revisar alineación codigo <-> nombres de columnas."
+    ))
+
+    #print(meta)
+  }
+
+  # Convertir a matriz; CLIMATOL lee los valores columna por columna
   out.data <- as.matrix(data)
   dimnames(out.data) <- NULL
 
