@@ -176,10 +176,10 @@ escribe_climatol <- function(meta, data, ruta, nombre){
   meta <- na.omit(meta)
   
   data <- data %>% dplyr::select(-c("date"))
-  print(head(data))
+  #print(head(data))
 
-  print(str(meta))
-  print(str(data))
+  #print(str(meta))
+  #print(str(data))
 
   #print(min(data[["año"]]))
   #print(max(data[["año"]]))
