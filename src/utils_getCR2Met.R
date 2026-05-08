@@ -1,16 +1,21 @@
-## METADATA -------------------------------------------------------------------
-## nombre script    : getCR2MET_dataPuntos2XLSX.R
-## autor            : Fernando Neira-Román / fneira.roman@gmail.com
-## version R        : R version 4.4.3 (2025-02-28 ucrt) / 2025-05-13
+#' @title:  utils_extrae_CR2MET.R  
+#' @description: legacy outdated code extraccion CR2MET
+#' @section LIMPIAR:  limpia el ambiente para evitar variables residuales
+#' @section AMBIENTE:  lee los datos de ambiente, directorios directamente de enviroment
+#' @section FUNCIONES:  llamado de funciones o de scripts especificos
+#' @section DIRECTORIOS:  reinterpreta directorios a como estaban inicialmente en script
+#' @section CODIGO:  operacion directa de codigo
+#' @section puntos aleatorios:  generacion putnos aleatorios extraccion informacion
 
-## LIMPIAR --------------------------------------------------------------------
+
+# LIMPIAR --------------------------------------------------------------------
 cat('\014')                 # limpiar consola
 try(dev.off(), silent = T)  # limpia graficos
 rm(list = ls())             # limpiar ambiente
 gc()                        # ejecuta garbage collection
 
 
-## AMBIENTE -------------------------------------------------------------------
+# AMBIENTE -------------------------------------------------------------------
 readRenviron(".env")
 DATA_ENT <- Sys.getenv("DATA_ENT")
 DATA_OUT <- Sys.getenv("DATA_OUT")
@@ -18,21 +23,21 @@ CUT_REG <-Sys.getenv("CUT_REG")
 DIR_CR2 <-Sys.getenv("DIR_CR2")
 DIR_CR2_OUT <-Sys.getenv("DIR_CR2_OUT")
 
-## LIBRERIAS ------------------------------------------------------------------
+# LIBRERIAS ------------------------------------------------------------------
 libs <- c('tidyr', 'dplyr','tidync','terra','tidyterra','ggplot2', 'ggspatial')
 sapply(libs, require, character.only = TRUE, quietly = TRUE)
 
 
-## FUNCIONES ------------------------------------------------------------------
+# FUNCIONES ------------------------------------------------------------------
 source('src/utils_carga_BASEMAPS.R')
 
 
 
-## DIRECTORIOS -----------------------------------------------------------------
+# DIRECTORIOS -----------------------------------------------------------------
 dirEnt <- DIR_CR2
 dirOut <- DIR_CR2_OUT
 
-## CODIGO ----------------------------------------------------------------------
+# CODIGO ----------------------------------------------------------------------
 
 lst <- list.files(
   path = file.path(dirEnt, 'txn'),

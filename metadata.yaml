@@ -1,0 +1,55 @@
+project:
+  name: "climate-homogen-fill"
+  autor: "Fernando Neira-Román"
+  version: "1.0.0"
+  description: "Genera procesamiento con Climatol R, para evaluar estado de las estaciones, buscando la homogenizacion."
+  status: "active"
+  category: "Data Engineering / Climate Science"
+
+stack:
+  primary_language: "R"        # main language of this project  
+  secondary_language: "Python" # secondary language for some of the different process or needs. enviroment created
+  frameworks:
+    - "Ollama"                 # For automatic descriptions in different files
+  tools:
+    - "config.R"                      # Load credential, directories, libraries, variables, central and unique
+    - "main.R"                        # Orchestration script for downloading and extracting ERA5 data based on user options
+    - "src/utils_carga_BaseMaps.R"    # load spatial data, like spatial administrative limits for the analysis REGION
+    - "src/utils_color.R"             # different palettes used for plots or data representation
+    - "src/utils_escribe_climatol.R"  # write data in climatol special data format. "DAT Files"
+    - "src/utils_extrae_CR2MET.R"     # legacy outdated script to extract data from CR2MET
+    - "src/utils_getCR2MET.R"         # legacy outdated script to extract data from CR2MET
+    - "src/utils_"                    # Creacion automatica de archivo readme
+    - "skills/readme_skill.py"        # creation of readme file, use LLM call from ollama
+    - "skills/treemap.py"             # creation of an structure treemap of the project
+
+conventions:
+  fixed_variable : "SCREAMING_SNAKE_CASE" # like folders or inmmutable variables like CUT_REG
+  variable_naming: "snake_case"
+  function_naming: "snake_case" # Siguiendo el estándar actual de descarga.py y main.py
+  boolean_prefix: "is_"
+  
+  typing:
+    style: "hinted"             # Uso de Type Hints en Python
+    
+  documentation:
+    format: "Google Style"      # Comentarios claros como los de treemap.py
+    language: "es"              # Descripciones en español (como en descarga.py)
+
+data_flow:
+  raw_data: ".xlsx"             # from data/
+  raw_format: ".grib"           # Ubicados en era5_raw/
+  processed_format: ".csv"      # Ubicados en era5_output/
+  metadata_file: "estaciones.csv"
+
+# Configuración específica para tus flujos de "Vibe Coding" con Ollama
+ai_context:
+  model_preference: "deepseek-coder" # O el que estés probando localmente
+  context_files:
+    - "TREEMAP.md"
+    - "metadata.yaml"
+    - "config.py"
+  avoid_patterns:
+    - "hardcoded_credentials"
+    - "hardcoded_paths"
+    - "absolute_paths"

@@ -1,8 +1,6 @@
-## METADATA -------------------------------------------------------------------
-## nombre script    : carga_BASEMAPS.R
-## proposito        : cargar datos relativos a capas base, como dpa y satelite
-## autor            : Fernando Neira-Román
-## Email            : fneira.roman@gmail.com
+#' @title:  utils_carga_BaseMaps.R 
+#' @description:  cargar datos relativos a capas base, como dpa y satelite
+#' @section:  necesita conexion internet
 
 
 

@@ -1,3 +1,7 @@
+#' @title:  plt_ts_anomaly.R  
+#' @description:  grafico de serie de tiempo y anamolias su enfoque es mostrar aquellos valores anomalos en la serie de tiempo
+#' @section:  necesita desarrollo y algunas librerias extra, aun no esta completo
+
 
 library(performance)
 library(see)

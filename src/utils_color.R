@@ -1,12 +1,19 @@
-# PALETAS COLORES ####
+#' @title:  utils_color.R  
+#' @description:  distintas paletas de colores y rampas de colores para diseño y uso en graficos, como funciones.
+#' @section meme_palette:
+#' - paleta de colores basadas en meme, no respeta daltonismo
+#' @section classic_palette:
+#' - paleta de colores clasicas
 
-# chilean color palette ####
+
+# meme_palette   --------------------------------------------------------------
 
 # mira esa wea hermano
 mswh = colorRampPalette(c(
     "#5A9DC8", "#007CB8", "#015593", "#013281", "#722142", 
     "#C8A115", "#B27362", "#66342D", "#21201C"
 ), space="Lab")
+
 
 # me pase poh (2016)
 mpp = colorRampPalette(c(
@@ -15,15 +22,19 @@ mpp = colorRampPalette(c(
     "#CD2B36"
 ), space = "Lab")
 
-# otros ####
+
+
+# classic_palette  ------------------------------------------------------------
+
 pal.RdWhBu <- colorRampPalette(c("red", "white", "blue"), space = "Lab")
+
 pal.RdYwGr <- colorRampPalette(c("red", "yellow", "green"), space = "Lab")
+
 pal.PuWhGr <- colorRampPalette(c("purple", "white", "green"), space = "Lab")
 
 pal.sunset <- colorRampPalette(c("red", "white", "blue"), space = "Lab")
 
 
-# viridis palette #####
 pal.viridis <- colorRampPalette(c(
     "#FDE625", "#DBE327", "#B8DE2A", "#99D741", "#76CF54",
     "#5DC565", "#41BA74", "#30AF7E", "#25A385", "#22968A", 
@@ -31,12 +42,14 @@ pal.viridis <- colorRampPalette(c(
     "#3F4587", "#45367F", "#472676", "#461664", "#440053"
 ), space = "Lab")
 
+
 pal.cividis <- colorRampPalette(c(
     "#00204DFF", "#002A64FF", "#00336FFF", "#1F3C6DFF", "#35466BFF",
     "#444F6BFF", "#53596CFF", "#5F636EFF", "#6B6C71FF", "#777776FF",
     "#838079FF", "#908B79FF", "#9D9677FF", "#ABA074FF", "#B9AC70FF",
     "#C7B76BFF", "#D7C463FF", "#E5D05AFF", "#F5DD4DFF", "#FFEA46FF"
 ), space = "Lab")
+
 
 pal.magma <- colorRampPalette(c(
     "#000004FF", "#07071DFF", "#160F3BFF", "#29115AFF", "#400F73FF", 
@@ -68,5 +81,3 @@ pal.turbo <- colorRampPalette(c(
     "#B5F836FF", "#D6E635FF", "#EFCD3AFF", "#FCB036FF", "#FD8A26FF",
     "#F36215FF", "#E14209FF", "#C82803FF", "#A51301FF", "#7A0403FF"
 ), space = "Lab")
-
-

@@ -11,22 +11,27 @@ ETL flow: Excel read → processing → results write.
 
 ```
 graficos/
-├── main.R                           # Entry point - ETL pipeline orchestration
-├── .env                             # Paths, environment variables (CUT_REG=10)
-├── data/
+├── data
 │   └── BBDD_2026_LOS_RIOS.xlsx      # DB: daily observations + station metadata
-├── output/                          # Results folder (defined in .env)
-│   └── ASDF_FICHA2026_*.xlsx        # Generated outputs
-├── Utility & Plotting Scripts (root level):
-│   ├── utils_escribe_climatol.R     # Climatol format export
-│   ├── utils_carga_BaseMaps.R       # Base maps Chile (DPA shapefiles + ESRI tiles)
-│   ├── utils_color.R                # Custom color palettes
-│   ├── utils_getCR2Met.R            # Extract NetCDF CR2MET → Excel
-│   ├── utils_lee_CR2Met.R           # Read Excel from getCR2Met
-│   ├── utils_pivotdata.R            # Stub (pending implementation)
-│   ├── plt_heatmap.R                # Data completeness heatmap
-│   └── plt_ts_anomaly.R             # Time series outlier detection
-└── src/                             # Deprecated (scripts moved to root)
+│   └── BBDD_ERA5_2026_LOS_RIOS.xlsx # DB: daily observations + station metadata
+├── output
+├── src
+│   ├── plt_heatmap.R  # —
+│   ├── plt_ts_anomaly.R  # —
+│   ├── utils_carga_BaseMaps.R  # —
+│   ├── utils_color.R  # —
+│   ├── utils_escribe_climatol.R  # —
+│   ├── utils_extrae_CR2Met.R  # —
+│   ├── utils_getCR2Met.R  # —
+│   └── utils_pivotdata.R  # —
+├── .env
+├── config.R  # —
+├── LICENSE
+├── main.py  # —
+├── main.R  # —
+├── metadata.yaml
+├── pyproject.toml
+└── README.md
 ```
 
 **Meteorological variables:** tn (T min), tx (T max), pp (precipitation), rd (radiation), 

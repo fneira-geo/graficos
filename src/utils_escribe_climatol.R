@@ -1,3 +1,13 @@
+#' @title:  utils_escribe_climatol.R  
+#' @description:  da formato de los datos en dataframe wide, entregar la estructura
+#' de datos necesarias para escribir datos para ser leidos por paquete CLIMATOL
+#' @section REORDENA:
+#' - toma el dataframe y reordena los datos para climatol.
+#' @section ESCRIBE:
+#' - escribe los datos ordenados en la funcion anterior, para escribir los archivos.
+
+
+# REORDENA --------------------------------------------------------------------
 writeClimatolFiles <- function(meta, data) {
 
     out.meta <- meta %>%
@@ -16,6 +26,8 @@ writeClimatolFiles <- function(meta, data) {
 }
 
 
+
+# ESCRIBE ---------------------------------------------------------------------
 writeClimatolFiles <- function(meta, data) {
   
   # Faster selection and renaming using basic indexing

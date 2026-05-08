@@ -1,0 +1,7 @@
+
+HOMOGEN() APPLICATION OUTPUT  (From R's contributed package 'climatol' 4.3-2a)
+
+=========== Homogenization of PP_1990-2020, 1990-2021. (Wed May  6 16:47:16 2026)
+
+ Parameters: varcli=PP_1990-2020, anyi=1990, anyf=2021, test=snht, nref=10 10 4, std=2, swa=NA, ndec=1, niqd=4 6 1, dz.max=0.01, dz.min=-0.01, cumc=NA, wd=0 0 100, inht=0 0, sts=5, tol=0.02, maxdif=0.05, maxite=999, force=FALSE, wz=0.001, mindat=NA, onlyQC=TRUE, annual=sum, ini=NA, na.strings=NA, vmin=0, vmax=NA, hc.method=ward.D2, nclust=300, cutlev=NA, grdcol=#666666, mapcol=#666666, expl=TRUE, metad=TRUE, sufbrk=m, tinc=NA, tz=utc, rlemin=NA, rlemax=NA, cex=0.8, uni=NA, raway=2, graphics=TRUE, verb=TRUE, logf=TRUE, snht1=NA, snht2=NA, gp=NA
+
