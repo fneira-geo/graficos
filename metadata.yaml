@@ -1,55 +1,162 @@
 project:
-  name: "climate-homogen-fill"
+  name: "GRAFICOS"
   autor: "Fernando Neira-Román"
+  email: "fneira.roman@gmail.com"
   version: "1.0.0"
-  description: "Genera procesamiento con Climatol R, para evaluar estado de las estaciones, buscando la homogenizacion."
+  description: >
+    Pipeline ETL de análisis climático para estaciones meteorológicas en la Región de Los Ríos (Chile).
+    Procesa datos diarios de estaciones DGA-INIA y datos ERA5, agrega a escala mensual,
+    y ejecuta análisis de homogenización y relleno de datos mediante el paquete CLIMATOL,
+    siguiendo estándares OMM (WMO). Incluye corrección de sesgo cuantil (QDM) entre
+    estaciones y ERA5.
+  region: "Los Ríos, Chile"
+  cut_reg: 10
+  period: "1990–2020"
   status: "active"
-  category: "Data Engineering / Climate Science"
+  category: "Climate Science / Data Engineering"
 
 stack:
-  primary_language: "R"        # main language of this project  
-  secondary_language: "Python" # secondary language for some of the different process or needs. enviroment created
-  frameworks:
-    - "Ollama"                 # For automatic descriptions in different files
-  tools:
-    - "config.R"                      # Load credential, directories, libraries, variables, central and unique
-    - "main.R"                        # Orchestration script for downloading and extracting ERA5 data based on user options
-    - "src/utils_carga_BaseMaps.R"    # load spatial data, like spatial administrative limits for the analysis REGION
-    - "src/utils_color.R"             # different palettes used for plots or data representation
-    - "src/utils_escribe_climatol.R"  # write data in climatol special data format. "DAT Files"
-    - "src/utils_extrae_CR2MET.R"     # legacy outdated script to extract data from CR2MET
-    - "src/utils_getCR2MET.R"         # legacy outdated script to extract data from CR2MET
-    - "src/utils_"                    # Creacion automatica de archivo readme
-    - "skills/readme_skill.py"        # creation of readme file, use LLM call from ollama
-    - "skills/treemap.py"             # creation of an structure treemap of the project
+  primary_language: "R"
+  r_version: "4.4.3+"
+  secondary_language: "Python"
+  python_version: "3.12 LTS"
+  python_env: "uv (local .venv/)"
 
-conventions:
-  fixed_variable : "SCREAMING_SNAKE_CASE" # like folders or inmmutable variables like CUT_REG
-  variable_naming: "snake_case"
-  function_naming: "snake_case" # Siguiendo el estándar actual de descarga.py y main.py
-  boolean_prefix: "is_"
-  
-  typing:
-    style: "hinted"             # Uso de Type Hints en Python
-    
-  documentation:
-    format: "Google Style"      # Comentarios claros como los de treemap.py
-    language: "es"              # Descripciones en español (como en descarga.py)
+  r_packages:
+    - "climatol"      # Homogenización y relleno de series climatológicas
+    - "dplyr"         # Manipulación de datos
+    - "tidyr"         # Transformación wide/long
+    - "lubridate"     # Manejo de fechas
+    - "readxl"        # Lectura de archivos Excel
+    - "writexl"       # Escritura de archivos Excel
+    - "ggplot2"       # Visualización
+    - "ggspatial"     # Extensión espacial para ggplot2
+    - "basemaps"      # Mapas base para visualización espacial
+    - "terra"         # Datos raster/vectoriales
+    - "tidync"        # Lectura de NetCDF (ERA5)
+    - "tidyterra"     # Integración terra + tidyverse
+    - "dotenv"        # Carga de variables de entorno desde .env
+    - "here"          # Rutas relativas portables
+
+  frameworks:
+    - "Ollama"        # LLM local para generación de descripciones automáticas
+
+data_sources:
+  dga_inia:
+    description: "Estaciones meteorológicas terrestres DGA e INIA en Los Ríos"
+    format: ".xlsx"
+    sheets: ["metadata", "datos_diarios"]
+    variables: [tn, tx, pp]
+  era5:
+    description: "Reanálisis ERA5 del ECMWF, datos diarios por punto de grilla"
+    format: ".xlsx"
+    variables: [tn, tx, pp]
+    unit_conversion:
+      pp: "m/s → mm/mes (× 1000 × días_mes)"
+      tn: "K → °C (− 273.5)"
+      tx: "K → °C (− 273.5)"
+  cr2met:
+    description: "Grillado climático diario CR2MET 1990–2022 (NetCDF)"
+    status: "legacy / no activo"
+    format: ".nc"
+
+variables:
+  tn: "Temperatura mínima (°C)"
+  tx: "Temperatura máxima (°C)"
+  pp: "Precipitación (mm)"
+  rd: "Radiación solar (pendiente)"
+  hr: "Humedad relativa (pendiente)"
+  vv: "Velocidad del viento (pendiente)"
+  ps: "Presión atmosférica (pendiente)"
+
+tools:
+  orchestration:
+    - path: "config.R"
+      description: "Configuración global: librerías, rutas (.env), constantes (CUT_REG)"
+    - path: "main.R"
+      description: "Orquestador principal del pipeline ETL: carga → agrega → escribe → ejecuta climatol"
+
+  utils:
+    - path: "src/utils_lee_xls_data.R"
+      description: "Lectura estandarizada de datos diarios desde archivos Excel (.xlsx)"
+    - path: "src/utils_calcular_mensuales.R"
+      description: "Agregación diaria → mensual (suma para pp, min/max para temperatura)"
+    - path: "src/utils_calcular_climatologia_anual.R"
+      description: "Cálculo de climatología anual de referencia por estación"
+    - path: "src/utils_escribe_climatol.R"
+      description: "Escritura de datos en formato DAT/EST requerido por CLIMATOL"
+    - path: "src/utils_carga_BaseMaps.R"
+      description: "Carga de límites administrativos espaciales para la región"
+    - path: "src/utils_color.R"
+      description: "Paletas de colores para gráficos y representaciones visuales"
+    - path: "src/utils_pivotdata.R"
+      description: "Transformación pivot de datos (pendiente implementación)"
+    - path: "src/utils_extrae_CR2Met.R"
+      description: "Extracción de datos CR2MET (legacy, sin uso activo)"
+    - path: "src/utils_getCR2Met.R"
+      description: "Descarga de datos CR2MET (legacy, sin uso activo)"
+
+  plots:
+    - path: "src/plt_heatmap.R"
+      description: "Mapa de calor para visualización de series temporales por estación"
+    - path: "src/plt_ts_anomaly.R"
+      description: "Gráfico de anomalías en series de tiempo"
+    - path: "src/plt_mapa.R"
+      description: "Mapa espacial de estaciones en la región"
+
+  analysis:
+    - path: "src/qdm_bias_correction.R"
+      description: "Corrección de sesgo por Quantile Delta Mapping (QDM) entre estaciones y ERA5"
+
+  python_skills:
+    - path: "skills/readme_skill.py"
+      description: "Generación automática de README usando LLM (Ollama)"
+    - path: "skills/treemap.py"
+      description: "Generación de árbol de estructura del proyecto (TREEMAP.md)"
 
 data_flow:
-  raw_data: ".xlsx"             # from data/
-  raw_format: ".grib"           # Ubicados en era5_raw/
-  processed_format: ".csv"      # Ubicados en era5_output/
-  metadata_file: "estaciones.csv"
+  step_1: "Lectura Excel (.xlsx) → datos diarios por estación"
+  step_2: "Agregación diaria → mensual (pp: suma | tn/tx: min/max)"
+  step_3: "Pivot wide → formato matricial estación × tiempo"
+  step_4: "Escritura en formato CLIMATOL (.dat + .est)"
+  step_5: "Ejecución CLIMATOL → homogenización y relleno de gaps"
+  step_6: "Lectura resultados CLIMATOL → exportación CSV + PDF"
+  outputs:
+    - "output/CLIMATOL/*.dat"
+    - "output/CLIMATOL/*.est"
+    - "output/CLIMATOL/*.pdf"
+    - "output/CLIMATOL/*_out.csv"
 
-# Configuración específica para tus flujos de "Vibe Coding" con Ollama
+conventions:
+  fixed_variable: "SCREAMING_SNAKE_CASE"   # CUT_REG, DIR_ENT, DIR_OUT
+  variable_naming: "snake_case"
+  function_naming: "snake_case"
+  boolean_prefix: "is_"
+  script_prefixes:
+    plt_: "funciones/scripts de visualización"
+    utils_: "utilidades y helpers"
+    funcs_: "librerías de funciones"
+
+  r_script_sections:
+    order: [METADATA, SETUP, ENTORNO, DEPENDENCIAS, FUNCIONES, PIPELINE, SALIDA]
+    library_rule: "Todas las librerías se cargan SOLO en main.R vía config.R; scripts secundarios usan package::function()"
+
+  paths: "Nunca hardcodeadas → siempre vía .env (here + dotenv)"
+  encoding: "UTF-8"
+  indentation: "2 espacios"
+  documentation:
+    format: "Google Style"
+    language: "es"
+
 ai_context:
-  model_preference: "deepseek-coder" # O el que estés probando localmente
+  model_preference: "deepseek-coder"
   context_files:
     - "TREEMAP.md"
     - "metadata.yaml"
-    - "config.py"
+    - "config.R"
+    - "CLAUDE.md"
   avoid_patterns:
     - "hardcoded_credentials"
     - "hardcoded_paths"
     - "absolute_paths"
+    - "library() en scripts secundarios"
